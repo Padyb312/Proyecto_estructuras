@@ -3,14 +3,15 @@ package modelo;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Franja {
+public final class Franja {
 
-	public List<String> franja = new ArrayList<>();
+	public List<String> franja = new ArrayList<>(24);
 
 	public Franja() {
 	}
 
 	{
+		// Crea_las_franjas
 		/* 0 */franja.add("00:00 a.m a 01:00 a.m = 0");
 		/* 1 */franja.add("01:00 a.m a 02:00 a.m = 1");
 		/* 2 */franja.add("02:00 a.m a 03:00 a.m = 2");
@@ -38,22 +39,21 @@ public class Franja {
 
 	}
 
+	// Contructor_Franja
 	public Franja(List<String> franja) {
 		super();
 		this.franja = franja;
 	}
 
+	// Solo_muestra
 	public List<String> getFranja() {
 		return franja;
 	}
 
-	public void setFranja(List<String> franja) {
-		this.franja = franja;
-	}
-
-	public void mostrarFranaja() {
+	// Imprimir_franja
+	public void mostrarFranja() {
 		for (String f : franja) {
-			System.out.println(" "+f);
+			System.out.println(" " + f);
 
 		}
 	}
