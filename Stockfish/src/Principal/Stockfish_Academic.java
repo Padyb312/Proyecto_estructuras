@@ -24,7 +24,8 @@ public class Stockfish_Academic {
 			System.out.println("1. PROGRAMAR EVENTO");
 			System.out.println("2. ELIMINAR EVENTO");
 			System.out.println("3. VER CALENDARIO");
-			System.out.println("4. SALIR");
+			System.out.println("4. Franjas");
+			System.out.println("5. SALIR");
 			eleccion = teclado.nextInt();
 			switch (eleccion) {
 			case 1:
@@ -61,13 +62,17 @@ public class Stockfish_Academic {
 				usuario.mostrar();
 				break;
 			case 4:
+				Franja fran = new Franja();
+				fran.mostrarFranja();
+				break;
+			case 5:
 				System.out.println("PROGRAMA FINALIZADO");
 				break;
 			default:
 				System.out.println("OPCION INVALIDA");
 
 			}
-		} while (eleccion != 4);
+		} while (eleccion != 5);
 	}
 
 }
