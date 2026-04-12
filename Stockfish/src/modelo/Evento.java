@@ -1,6 +1,8 @@
 package modelo;
 
-public abstract class Evento {
+import java.io.Serializable;
+
+public abstract class Evento implements Serializable {
 	public String id;
 	public String fecha;
 	public String actividad;
