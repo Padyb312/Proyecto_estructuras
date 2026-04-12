@@ -13,7 +13,7 @@ public class Menu {
 
 		String fechaInicio, fechaEntrga, descripcion;
 		int prioridad = 0, franja=-1, comparacion=0;
-		boolean estado; 
+		boolean estado=false; 
 		int opcion;
 		do {
 			System.out.println("--------MENU-------");
@@ -32,7 +32,7 @@ public class Menu {
 				do {
 					System.out.println("----Sub MENU----");
 					System.out.println("1. Tarea");
-					System.out.println("2. Evento Personal o activida Curricular");
+					System.out.println("2. Evento Personal o activida extraCurricular");
 					System.out.println("3. volver");
 					opcion = teclado.nextInt();
 
@@ -45,7 +45,7 @@ public class Menu {
 						System.out.println("Digite Fecha de Entrega DD/MM/YY");
 						fechaEntrga = teclado.next();
 						
-						System.out.println("Digite descripcion de la Tarea");
+						System.out.println("Digite Materia ");
 						descripcion = teclado.next();
 						
 						while (franja<0||franja>23) {
@@ -54,7 +54,7 @@ public class Menu {
 							fran.mostrarFranja();
 							franja=teclado.nextInt();
 							if (franja < 1 || franja > 23) {
-								
+								System.out.println("Opción inválida. Solo se permite numeros del 0 al 23.");
 							}
 						}
 
@@ -68,20 +68,62 @@ public class Menu {
 						while (comparacion < 1 || comparacion > 2) {
 							System.out.println("Ingrese estado 1(Completado), 2(Incompleto) ");
 							comparacion = teclado.nextInt();
-							if (comparacion < 1 || comparacion > 2) {
-								System.out.println("Opción inválida. Solo se permite 1 o 2 ");
-							}
 							if(comparacion==1 ) {
 								estado=true;
 							}
 							if(comparacion==2 ) {
 								estado=false;
 							}
-						}
+							if (comparacion < 1 || comparacion > 2) {
+								System.out.println("Opción inválida. Solo se permite 1 o 2 ");
+							}
 						
+						}
+						Evento tareaBase = new Tarea(fechaEntrga, descripcion, prioridad, estado, franja, descripcion, fechaInicio); 
+						operaciones.crear(tareaBase);
 
 						break;
 					case 2:
+						
+						System.out.println("Digite Fecha de Evento DD/MM/YY");
+						fechaEntrga = teclado.next();
+						
+						System.out.println("Descripcion ");
+						descripcion = teclado.next();
+						
+						while (franja<0||franja>23) {
+							System.out.println("Digite horario segun la siguinte franja");
+							Franja fran = new Franja();
+							fran.mostrarFranja();
+							franja=teclado.nextInt();
+							if (franja < 1 || franja > 23) {
+								System.out.println("Opción inválida. Solo se permite numeros del 0 al 23.");
+							}
+						}
+
+						while (prioridad < 1 || prioridad > 3) {
+							System.out.println("Ingrese Prioridad 1(Alta), 2(Media), 3(Baja): ");
+							prioridad = teclado.nextInt();
+							if (prioridad < 1 || prioridad > 3) {
+								System.out.println("Opción inválida. Solo se permite 1, 2 o 3.");
+							}
+						}
+						while (comparacion < 1 || comparacion > 2) {
+							System.out.println("Ingrese estado 1(Completado), 2(Incompleto) ");
+							comparacion = teclado.nextInt();
+							if(comparacion==1 ) {
+								estado=true;
+							}
+							if(comparacion==2 ) {
+								estado=false;
+							}
+							if (comparacion < 1 || comparacion > 2) {
+								System.out.println("Opción inválida. Solo se permite 1 o 2 ");
+							}
+						
+						}
+						Evento personalBase = new ActividadPersonal(fechaEntrga, descripcion, prioridad, estado, franja); 
+						operaciones.crear(personalBase);
 
 						break;
 
