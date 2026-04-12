@@ -3,6 +3,9 @@ package modelo;
 import java.io.Serializable;
 
 public abstract class Evento implements Serializable {
+	
+	
+	
 	public String id;
 	public String fecha;
 	public String actividad;
@@ -10,12 +13,15 @@ public abstract class Evento implements Serializable {
 	public boolean estado;
 	public int franja;
 
+	
+
 	public Evento(String fecha, String actividad, int prioridad, boolean estado, int franja) {
-		super();
+		this.id = String.valueOf(IdEvento.generarId()); // 👈 ID generado automáticamente
+		this.fecha = fecha;
 		this.actividad = actividad;
 		this.prioridad = prioridad;
 		this.estado = estado;
-		this.fecha = fecha;
+		this.franja = franja;
 	}
 
 	public String getId() {
@@ -60,6 +66,12 @@ public abstract class Evento implements Serializable {
 
 	public void setFranja(int franja) {
 		this.franja = franja;
+	}
+
+	@Override
+	public String toString() {
+		return "ID: " + id + " | Fecha: " + fecha + " \n | Actividad: " + actividad + " | Prioridad: " + prioridad
+				+ "\n | Estado: " + estado + " | Franja: " + franja;
 	}
 
 	public String cambiarEstado(boolean estado) {

@@ -56,11 +56,11 @@ public class ImplementacionOperacionCRUD implements OperacionCRUD , OperacionArc
         return null;
     }
     @Override
-    public String serializar(List<Evento> trajes, String path, String name) {
+    public String serializar(List<Evento> eventos, String path, String name) {
         try {
             FileOutputStream fos = new FileOutputStream(path + name);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(trajes);
+            oos.writeObject(eventos);
             oos.close();
             fos.close();
             return "File created!!";

@@ -2,6 +2,8 @@ package modelo;
 
 public class Tarea extends Evento {
 
+
+	
 	public String materia;
 	public String fechaInicio;
 	
