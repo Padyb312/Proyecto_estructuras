@@ -6,21 +6,23 @@ public class IdEvento implements Serializable {
 
 	
 
-	private static int cont = 0; // 👈 static para que sea compartido entre todos
+	private static int cont = 0; 
 
 	public IdEvento() {
 		super();
 	}
 
-	public static int generarId() { // 👈 static para llamarlo sin instanciar
-		return ++cont;
+	public static int generarId() {
+		int generar=cont;
+		++cont;
+		return generar;
 	}
 
 	public static int getCont() {
 		return cont;
 	}
 
-	public static void setCont(int cont) { // 👈 Para restaurar al deserializar
+	public static void setCont(int cont) { 
 		IdEvento.cont = cont;
 	}
 }

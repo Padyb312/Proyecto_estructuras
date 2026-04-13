@@ -88,8 +88,7 @@ public class Menu {
 							}
 
 						}
-						List<Evento> eventos = operaciones.mostrarTodos();
-						eventos.size();
+						
 						Evento tareaBase = new Tarea(fechaEntrga, descripcion, prioridad, estado, franja, materia,
 								fechaInicio);
 
