@@ -241,7 +241,7 @@ public class Menu {
 			}
 
 		} while (opcion != 8);
-		System.out.println("Ruta actual: " + System.getProperty("user.dir"));
+		//System.out.println("Ruta actual: " + System.getProperty("user.dir"));
 	}
 	
 
