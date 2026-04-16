@@ -57,7 +57,7 @@ public class Menu {
 						System.out.println("Ingrese Actividad ");
 						descripcion = teclado.next();
 
-						while (franja < 0 || franja > 23) {
+						do {
 							System.out.println("Digite horario segun la siguinte franja");
 							Franja fran = new Franja();
 							fran.mostrarFranja();
@@ -65,16 +65,18 @@ public class Menu {
 							if (franja < 1 || franja > 23) {
 								System.out.println("Opción inválida. Solo se permite numeros del 0 al 23.");
 							}
-						}
+						} while (franja < 0 || franja > 23);
 
-						while (prioridad < 1 || prioridad > 3) {
+						do {
 							System.out.println("Ingrese Prioridad 1(Alta), 2(Media), 3(Baja): ");
 							prioridad = teclado.nextInt();
 							if (prioridad < 1 || prioridad > 3) {
 								System.out.println("Opción inválida. Solo se permite 1, 2 o 3.");
 							}
-						}
-						while (comparacion < 1 || comparacion > 2) {
+						} while (prioridad < 1 || prioridad > 3);
+
+						do {
+
 							System.out.println("Ingrese estado 1(Completado), 2(Incompleto) ");
 							comparacion = teclado.nextInt();
 							if (comparacion == 1) {
@@ -87,8 +89,8 @@ public class Menu {
 								System.out.println("Opción inválida. Solo se permite 1 o 2 ");
 							}
 
-						}
-						
+						} while (comparacion < 1 || comparacion > 2);
+
 						Evento tareaBase = new Tarea(fechaEntrga, descripcion, prioridad, estado, franja, materia,
 								fechaInicio);
 
@@ -100,10 +102,11 @@ public class Menu {
 						System.out.println("Digite Fecha de Evento DD/MM/YY");
 						fechaEntrga = teclado.next();
 
-						System.out.println("Descripcion ");
+						System.out.println("Descripcion  (Sin espacios) ");
 						descripcion = teclado.next();
 
-						while (franja < 0 || franja > 23) {
+						do {
+
 							System.out.println("Digite horario segun la siguinte franja");
 							Franja fran = new Franja();
 							fran.mostrarFranja();
@@ -111,8 +114,11 @@ public class Menu {
 							if (franja < 1 || franja > 23) {
 								System.out.println("Opción inválida. Solo se permite numeros del 0 al 23.");
 							}
-						}
 
+						} while (franja < 0 || franja > 23);
+
+						System.out.println("Ingrese Prioridad 1(Alta), 2(Media), 3(Baja): ");
+						prioridad = teclado.nextInt();
 						while (prioridad < 1 || prioridad > 3) {
 							System.out.println("Ingrese Prioridad 1(Alta), 2(Media), 3(Baja): ");
 							prioridad = teclado.nextInt();
@@ -225,7 +231,7 @@ public class Menu {
 					for (Evento puntero : listaImportar) {
 						operaciones.crear(puntero);
 					}
-					
+
 				} else {
 					System.out.println("No se encontraron eventos");
 				}
@@ -241,8 +247,7 @@ public class Menu {
 			}
 
 		} while (opcion != 8);
-		//System.out.println("Ruta actual: " + System.getProperty("user.dir"));
+		// System.out.println("Ruta actual: " + System.getProperty("user.dir"));
 	}
-	
 
 }
