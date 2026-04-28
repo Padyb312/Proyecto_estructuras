@@ -16,6 +16,57 @@ public class Menu {
 	public static void main(String[] args) {
 		Scanner teclado = new Scanner(System.in);
 		ImplementacionOperacionCRUD operaciones = new ImplementacionOperacionCRUD();
+		AutenticacionService auth = new AutenticacionService();
+
+		// ─── Menú de autenticación ───────────────────────────────────────────────────
+		boolean autenticado = false;
+		int opcionAuth;
+
+		do {
+			System.out.println("--------ACCESO-------");
+			System.out.println("1. Iniciar Sesion");
+			System.out.println("2. Registrarse");
+			System.out.println("3. Salir");
+			opcionAuth = teclado.nextInt();
+
+			switch (opcionAuth) {
+			case 1:
+				System.out.println("Correo institucional (@poligran.edu.co): ");
+				String correoLogin = teclado.next();
+				System.out.println("Contraseña: ");
+				String passLogin = teclado.next();
+
+				if (auth.login(correoLogin, passLogin)) {
+					System.out.println("Bienvenido, " + correoLogin + "!");
+					autenticado = true;
+				} else {
+					System.out.println("Correo o contraseña incorrectos.");
+				}
+				break;
+
+			case 2:
+				System.out.println("Correo institucional (@poligran.edu.co): ");
+				String correoReg = teclado.next();
+				System.out.println("Contraseña: ");
+				String passReg = teclado.next();
+				System.out.println("Confirmar contraseña: ");
+				String confirmacion = teclado.next();
+
+				System.out.println(auth.registrar(correoReg, passReg, confirmacion));
+				break;
+
+			case 3:
+				System.out.println("Saliendo....");
+				System.exit(0);
+				break;
+
+			default:
+				System.out.println("Opcion Invalida");
+			}
+
+		} while (!autenticado);
+
+		// ─── Menú principal ──────────────────────────────────────────────────────────
 
 		String fechaInicio, fechaEntrga, descripcion, materia, codigo, nuevaFecha;
 		int prioridad = 0, franja = -1, comparacion = 0;
@@ -75,8 +126,8 @@ public class Menu {
 							}
 						} while (prioridad < 1 || prioridad > 3);
 
+						comparacion = 0;
 						do {
-
 							System.out.println("Ingrese estado 1(Completado), 2(Incompleto) ");
 							comparacion = teclado.nextInt();
 							if (comparacion == 1) {
@@ -88,15 +139,13 @@ public class Menu {
 							if (comparacion < 1 || comparacion > 2) {
 								System.out.println("Opción inválida. Solo se permite 1 o 2 ");
 							}
-
 						} while (comparacion < 1 || comparacion > 2);
 
 						Evento tareaBase = new Tarea(fechaEntrga, descripcion, prioridad, estado, franja, materia,
 								fechaInicio);
-
 						System.out.println(operaciones.crear(tareaBase) + " Con el id: " + tareaBase.getId());
-
 						break;
+
 					case 2:
 
 						System.out.println("Digite Fecha de Evento DD/MM/YY");
@@ -106,7 +155,6 @@ public class Menu {
 						descripcion = teclado.next();
 
 						do {
-
 							System.out.println("Digite horario segun la siguinte franja");
 							Franja fran = new Franja();
 							fran.mostrarFranja();
@@ -114,7 +162,6 @@ public class Menu {
 							if (franja < 1 || franja > 23) {
 								System.out.println("Opción inválida. Solo se permite numeros del 0 al 23.");
 							}
-
 						} while (franja < 0 || franja > 23);
 
 						System.out.println("Ingrese Prioridad 1(Alta), 2(Media), 3(Baja): ");
@@ -126,7 +173,9 @@ public class Menu {
 								System.out.println("Opción inválida. Solo se permite 1, 2 o 3.");
 							}
 						}
-						while (comparacion < 1 || comparacion > 2) {
+
+						comparacion = 0;
+						do {
 							System.out.println("Ingrese estado 1(Completado), 2(Incompleto) ");
 							comparacion = teclado.nextInt();
 							if (comparacion == 1) {
@@ -138,12 +187,11 @@ public class Menu {
 							if (comparacion < 1 || comparacion > 2) {
 								System.out.println("Opción inválida. Solo se permite 1 o 2 ");
 							}
+						} while (comparacion < 1 || comparacion > 2);
 
-						}
 						Evento personalBase = new ActividadPersonal(fechaEntrga, descripcion, prioridad, estado,
 								franja);
 						System.out.println(operaciones.crear(personalBase) + " Con el id: " + personalBase.getId());
-
 						break;
 
 					case 3:
@@ -158,16 +206,13 @@ public class Menu {
 				break;
 
 			case 2:
-
 				System.out.println("Ingrese Codigo de Evento");
 				codigo = teclado.next();
 				System.out.println(operaciones.mostrarUno(codigo));
 				break;
 
 			case 3:
-
 				List<Evento> listaEventos = operaciones.mostrarTodos();
-
 				if (listaEventos.isEmpty()) {
 					System.out.println("No hay eventos registrados");
 				} else {
@@ -178,10 +223,10 @@ public class Menu {
 				break;
 
 			case 4:
-
 				System.out.println("Ingrese Codigo de Evento");
 				codigo = teclado.next();
 
+				comparacion = 0;
 				while (comparacion < 1 || comparacion > 2) {
 					System.out.println("Ingrese estado 1(Completado), 2(Incompleto) ");
 					comparacion = teclado.nextInt();
@@ -194,7 +239,6 @@ public class Menu {
 					if (comparacion < 1 || comparacion > 2) {
 						System.out.println("Opción inválida. Solo se permite 1 o 2 ");
 					}
-
 				}
 
 				Evento cambiarEstado = operaciones.mostrarUno(codigo);
@@ -204,7 +248,6 @@ public class Menu {
 					cambiarEstado.setEstado(estado);
 					System.out.println(operaciones.modificar(codigo, cambiarEstado));
 				}
-
 				break;
 
 			case 5:
@@ -216,7 +259,6 @@ public class Menu {
 			case 6:
 				String patch = "";
 				String name = "Eventos";
-
 				List<Evento> listaGuardar = operaciones.mostrarTodos();
 				System.out.println(operaciones.serializar(listaGuardar, patch, name));
 				System.out.println("Guardado....");
@@ -231,11 +273,9 @@ public class Menu {
 					for (Evento puntero : listaImportar) {
 						operaciones.crear(puntero);
 					}
-
 				} else {
 					System.out.println("No se encontraron eventos");
 				}
-
 				break;
 
 			case 8:
@@ -247,7 +287,6 @@ public class Menu {
 			}
 
 		} while (opcion != 8);
-		// System.out.println("Ruta actual: " + System.getProperty("user.dir"));
 	}
 
 }

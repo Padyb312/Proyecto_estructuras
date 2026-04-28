@@ -16,7 +16,7 @@ public abstract class Evento implements Serializable {
 	
 
 	public Evento(String fecha, String actividad, int prioridad, boolean estado, int franja) {
-		this.id = String.valueOf(IdEvento.generarId()); // 👈 ID generado automáticamente
+		this.id = String.valueOf(IdEvento.generarId()); //  ID generado automáticamente
 		this.fecha = fecha;
 		this.actividad = actividad;
 		this.prioridad = prioridad;
@@ -110,7 +110,7 @@ public abstract class Evento implements Serializable {
 
 	public String cambiarFranja(int franja) {
 		int origen = getFranja();
-		if (getPrioridad() == franja) {
+		if (getFranja() == franja) {
 			return "Franja no cambiada";
 		} else {
 			setFranja(franja);
