@@ -20,6 +20,7 @@ public class Menu {
 
 		// ─── Menú de autenticación ───────────────────────────────────────────────────
 		boolean autenticado = false;
+		String correoActivo = null;
 		int opcionAuth;
 
 		do {
@@ -37,8 +38,30 @@ public class Menu {
 				String passLogin = teclado.next();
 
 				if (auth.login(correoLogin, passLogin)) {
-					System.out.println("Bienvenido, " + correoLogin + "!");
+					correoActivo = correoLogin;
 					autenticado = true;
+
+					// Cargar eventos del usuario al iniciar sesión
+					try {
+						java.io.File archivoEventos = new java.io.File(archivoUsuario(correoActivo));
+						if (archivoEventos.exists()) {
+							List<Evento> eventosGuardados = operaciones.deserializar("", archivoUsuario(correoActivo));
+							if (eventosGuardados != null && !eventosGuardados.isEmpty()) {
+								for (Evento e : eventosGuardados) {
+									operaciones.crear(e);
+								}
+								System.out.println("Bienvenido, " + correoActivo + "! (" + eventosGuardados.size()
+										+ " eventos cargados)");
+							} else {
+								System.out.println("Bienvenido, " + correoActivo + "!");
+							}
+						} else {
+							System.out.println("Bienvenido, " + correoActivo + "!");
+						}
+					} catch (Exception e) {
+						System.out.println("Bienvenido, " + correoActivo + "!");
+					}
+
 				} else {
 					System.out.println("Correo o contraseña incorrectos.");
 				}
@@ -68,10 +91,11 @@ public class Menu {
 
 		// ─── Menú principal ──────────────────────────────────────────────────────────
 
-		String fechaInicio, fechaEntrga, descripcion, materia, codigo, nuevaFecha;
+		String fechaInicio, fechaEntrga, descripcion, materia, codigo;
 		int prioridad = 0, franja = -1, comparacion = 0;
 		boolean estado = false;
 		int opcion;
+
 		do {
 			System.out.println("--------MENU-------");
 			System.out.println("1. Crear Evento");
@@ -79,8 +103,8 @@ public class Menu {
 			System.out.println("3. Mostar Eventos");
 			System.out.println("4. Modificar Estado");
 			System.out.println("5. Eliminar Evento");
-			System.out.println("6. Guardar (Serializar)");
-			System.out.println("7. Cargar eventos Guardados (Deserializar)");
+			System.out.println("6. Guardar");
+			System.out.println("7. Eliminar Cuenta");
 			System.out.println("8. Salir");
 			opcion = teclado.nextInt();
 
@@ -257,29 +281,41 @@ public class Menu {
 				break;
 
 			case 6:
-				String patch = "";
-				String name = "Eventos";
-				List<Evento> listaGuardar = operaciones.mostrarTodos();
-				System.out.println(operaciones.serializar(listaGuardar, patch, name));
-				System.out.println("Guardado....");
+				try {
+					List<Evento> listaGuardar = operaciones.mostrarTodos();
+					System.out.println(operaciones.serializar(listaGuardar, "", archivoUsuario(correoActivo)));
+					System.out.println("Guardado....");
+				} catch (Exception e) {
+					System.out.println("Error al guardar los Eventos: " + e.getMessage());
+				}
 				break;
 
 			case 7:
-				String patch2 = "";
-				String name2 = "Eventos";
-				List<Evento> listaImportar = operaciones.deserializar(patch2, name2);
-				if (listaImportar != null && !listaImportar.isEmpty()) {
-					System.out.println("Importado.... " + listaImportar.size() + " eventos cargados");
-					for (Evento puntero : listaImportar) {
-						operaciones.crear(puntero);
-					}
-				} else {
-					System.out.println("No se encontraron eventos");
+				// Confirmar con contraseña antes de eliminar
+				System.out.println("Ingrese su contraseña para confirmar: ");
+				String passElim = teclado.next();
+				String resultado = auth.eliminar(correoActivo, passElim);
+				System.out.println(resultado);
+
+				// Si se eliminó exitosamente cerrar el programa
+				if (resultado.equals("Usuario eliminado exitosamente.")) {
+					// Borrar también el archivo de eventos del usuario
+					new java.io.File(archivoUsuario(correoActivo)).delete();
+					System.out.println("Hasta luego!");
+					System.exit(0);
 				}
 				break;
 
 			case 8:
-				System.out.println("Saliendo....");
+				// Guardar automáticamente al salir
+				try {
+					List<Evento> listaFinal = operaciones.mostrarTodos();
+					operaciones.serializar(listaFinal, "", archivoUsuario(correoActivo));
+					System.out.println("Eventos guardados. Hasta luego!");
+				} catch (Exception e) {
+					System.out.println("Error al guardar: " + e.getMessage());
+					System.out.println("Saliendo....");
+				}
 				break;
 
 			default:
@@ -287,6 +323,14 @@ public class Menu {
 			}
 
 		} while (opcion != 8);
+	}
+
+	/**
+	 * Convierte el correo en un nombre de archivo válido. Ejemplo:
+	 * juan@poligran.edu.co → juan_poligran_edu_co_eventos
+	 */
+	private static String archivoUsuario(String correo) {
+		return correo.replace("@", "").replace(".", "") + "Eventos";
 	}
 
 }

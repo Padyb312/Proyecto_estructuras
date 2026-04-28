@@ -56,7 +56,7 @@ public class ImplementacionOperacionCRUD implements OperacionCRUD , OperacionArc
         return null;
     }
     @Override
-    public String serializar(List<Evento> eventos, String path, String name) {
+    public String serializar(List<Evento> eventos, String path, String name)throws Exception  {
         try {
             FileOutputStream fos = new FileOutputStream(path + name);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -70,7 +70,7 @@ public class ImplementacionOperacionCRUD implements OperacionCRUD , OperacionArc
     }
 
     @Override
-    public List<Evento> deserializar(String path, String name) {
+    public List<Evento> deserializar(String path, String name) throws Exception {
         List<Evento> lista = null;
         try {
             FileInputStream fis = new FileInputStream(path + name);

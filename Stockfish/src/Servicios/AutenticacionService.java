@@ -94,4 +94,20 @@ public class AutenticacionService {
 			throw new RuntimeException("Error al hashear contraseña", e);
 		}
 	}
+	// Retorna mensaje según resultado de la eliminación
+	public String eliminar(String correo, String password) {
+	    if (!correoValido(correo)) {
+	        return "Correo inválido.";
+	    }
+	    String hash = hashSHA256(password);
+	    for (int i = 0; i < usuarios.size(); i++) {
+	        if (usuarios.get(i).getCorreo().equals(correo)
+	                && usuarios.get(i).getPasswordHash().equals(hash)) {
+	            usuarios.remove(i);
+	            guardarUsuarios();
+	            return "Usuario eliminado exitosamente.";
+	        }
+	    }
+	    return "Correo o contraseña incorrectos.";
+	}
 }
