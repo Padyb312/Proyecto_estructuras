@@ -1,27 +1,25 @@
 package modelo;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public abstract class Evento implements Serializable {
-	
-	
-	
-	public String id;
-	public String fecha;
-	public String actividad;
-	public int prioridad;
-	public boolean estado;
-	public int franja;
 
-	
+	private String id;
+	private LocalDate fecha;
+	private String actividad;
+	private int prioridad;
+	private boolean estado;
+	private LocalTime hora;
 
-	public Evento(String fecha, String actividad, int prioridad, boolean estado, int franja) {
-		this.id = String.valueOf(IdEvento.generarId()); //  ID generado automáticamente
+	public Evento(LocalDate fecha, String actividad, int prioridad, boolean estado, LocalTime hora) {
+		this.id = String.valueOf(IdEvento.generarId()); // ID generado automáticamente
 		this.fecha = fecha;
 		this.actividad = actividad;
 		this.prioridad = prioridad;
 		this.estado = estado;
-		this.franja = franja;
+		this.hora = hora;
 	}
 
 	public String getId() {
@@ -52,30 +50,31 @@ public abstract class Evento implements Serializable {
 		this.estado = estado;
 	}
 
-	public String getFecha() {
+	public LocalDate getFecha() {
 		return fecha;
 	}
 
-	public void setFecha(String fecha) {
+	public void setFecha(LocalDate fecha) {
 		this.fecha = fecha;
 	}
 
-	public int getFranja() {
-		return franja;
+	public LocalTime getHora() {
+		return hora;
 	}
 
-	public void setFranja(int franja) {
-		this.franja = franja;
+	public void setHora(LocalTime hora) {
+		this.hora = hora;
 	}
 
-	@Override
-	public String toString() {
-		return "ID: " + id + " | Fecha: " + fecha + " \n | Actividad: " + actividad + " | Prioridad: " + prioridad
-				+ "\n | Estado: " + estado + " | Franja: " + franja;
+	public String cambiarHora(LocalTime hora) {
+		if (this.hora.equals(hora))
+			return "Hora no cambiada";
+		this.hora = hora;
+		return "Hora actualizada a " + this.hora;
 	}
 
 	public String cambiarEstado(boolean estado) {
-		boolean origen = isEstado();
+
 		if (isEstado() == estado) {
 			return "Estado no cambiado";
 		} else {
@@ -86,7 +85,7 @@ public abstract class Evento implements Serializable {
 	}
 
 	public String cambiarPrioridad(int prioridad) {
-		int origen = getPrioridad();
+
 		if (getPrioridad() == prioridad) {
 			return "Prioridad no cambiado";
 		} else {
@@ -96,26 +95,18 @@ public abstract class Evento implements Serializable {
 		}
 	}
 
-	public String cambiarFecha(String fecha) {
-		String fechaOriginal = getFecha();
-		if (fechaOriginal.equals(fecha)) {
+	public String cambiarFecha(LocalDate fecha) {
+		if (getFecha().equals(fecha)) {
 			return "Fecha no cambiada";
-		} else {
-			setFecha(fecha);
-
-			return "Prioridad Actualizada a " + getFecha();
 		}
-
+		setFecha(fecha);
+		return "Fecha actualizada a " + getFecha();
 	}
 
-	public String cambiarFranja(int franja) {
-		int origen = getFranja();
-		if (getFranja() == franja) {
-			return "Franja no cambiada";
-		} else {
-			setFranja(franja);
-
-			return "Franja Actualizada a " + getFranja();
-		}
+	@Override
+	public String toString() {
+		return "ID: " + id + " | Fecha: " + fecha + " | Hora: " + hora + "\n | Actividad: " + actividad
+				+ " | Prioridad: " + prioridad + " | Estado: " + estado;
 	}
+
 }

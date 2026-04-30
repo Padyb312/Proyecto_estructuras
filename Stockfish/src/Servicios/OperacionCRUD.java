@@ -9,6 +9,7 @@ public interface OperacionCRUD {
 	public Evento mostrarUno(String numero_traje);
 
 	public List<Evento> mostrarTodos();
+	
 
 	public String modificar(String numero_traje, Evento objeto);
 	

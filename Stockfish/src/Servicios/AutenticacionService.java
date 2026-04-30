@@ -56,6 +56,10 @@ public class AutenticacionService {
 		return correo != null && correo.endsWith(DOMINIO) && correo.length() > DOMINIO.length();
 	}
 
+	private boolean telefonoValido(String telefono) {
+		return telefono != null && telefono.matches("\\d{10}") // exactamente 10 dígitos
+				&& telefono.startsWith("3"); // móviles colombianos
+	}
 	// ─── Persistencia ────────────────────────────────────────────────────────────
 
 	private void guardarUsuarios() {
@@ -94,20 +98,77 @@ public class AutenticacionService {
 			throw new RuntimeException("Error al hashear contraseña", e);
 		}
 	}
+
 	// Retorna mensaje según resultado de la eliminación
 	public String eliminar(String correo, String password) {
-	    if (!correoValido(correo)) {
-	        return "Correo inválido.";
-	    }
-	    String hash = hashSHA256(password);
-	    for (int i = 0; i < usuarios.size(); i++) {
-	        if (usuarios.get(i).getCorreo().equals(correo)
-	                && usuarios.get(i).getPasswordHash().equals(hash)) {
-	            usuarios.remove(i);
-	            guardarUsuarios();
-	            return "Usuario eliminado exitosamente.";
-	        }
-	    }
-	    return "Correo o contraseña incorrectos.";
+		if (!correoValido(correo)) {
+			return "Correo inválido.";
+		}
+		String hash = hashSHA256(password);
+		for (int i = 0; i < usuarios.size(); i++) {
+			if (usuarios.get(i).getCorreo().equals(correo) && usuarios.get(i).getPasswordHash().equals(hash)) {
+				usuarios.remove(i);
+				guardarUsuarios();
+				return "Usuario eliminado exitosamente.";
+			}
+		}
+		return "Correo o contraseña incorrectos.";
+	}
+	// ── Obtener usuario activo completo ─────────────────────────────────────────
+
+	public Usuario getUsuario(String correo) {
+		for (Usuario u : usuarios) {
+			if (u.getCorreo().equals(correo))
+				return u;
+		}
+		return null;
+	}
+
+	// ── Setters de WhatsApp independientes ──────────────────────────────────────
+
+	public String setTelefono(String correo, String telefono) {
+		if (!telefonoValido(telefono)) {
+			return "Teléfono inválido. Debe tener 10 dígitos. Ej: 3001234567";
+		}
+		Usuario u = getUsuario(correo);
+		if (u == null)
+			return "Usuario no encontrado.";
+
+		u.setTelefono("57" + telefono);
+		guardarUsuarios();
+		return "Teléfono actualizado: +57" + telefono;
+	}
+
+	public String setApiKey(String correo, String apiKey) {
+		if (apiKey == null || apiKey.isBlank()) {
+			return "La ApiKey no puede estar vacía.";
+		}
+		Usuario u = getUsuario(correo);
+		if (u == null)
+			return "Usuario no encontrado.";
+
+		u.setWhatsAppApiKey(apiKey);
+		guardarUsuarios();
+		return "ApiKey guardada correctamente.";
+	}
+
+	public String desenlazarWhatsApp(String correo) {
+		Usuario u = getUsuario(correo);
+		if (u == null)
+			return "Usuario no encontrado.";
+
+		u.desenlazarWhatsApp();
+		guardarUsuarios();
+		return "WhatsApp desenlazado.";
+	}
+
+	// ── Construir WhatsAppService si el usuario tiene todo configurado ───────────
+
+	public WhatsAppService buildWhatsAppService(String correo) {
+		Usuario u = getUsuario(correo);
+		if (u != null && u.tieneWhatsApp()) {
+			return new WhatsAppService(u.getTelefono(), u.getWhatsAppApiKey());
+		}
+		return null; // sin WhatsApp configurado
 	}
 }
