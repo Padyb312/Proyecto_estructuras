@@ -134,8 +134,7 @@ public class Menu {
 
 						do {
 							System.out.println("Digite horario segun la siguinte franja");
-							Franja fran = new Franja();
-							fran.mostrarFranja();
+
 							franja = teclado.nextInt();
 							if (franja < 1 || franja > 23) {
 								System.out.println("Opción inválida. Solo se permite numeros del 0 al 23.");
@@ -180,8 +179,7 @@ public class Menu {
 
 						do {
 							System.out.println("Digite horario segun la siguinte franja");
-							Franja fran = new Franja();
-							fran.mostrarFranja();
+
 							franja = teclado.nextInt();
 							if (franja < 1 || franja > 23) {
 								System.out.println("Opción inválida. Solo se permite numeros del 0 al 23.");
