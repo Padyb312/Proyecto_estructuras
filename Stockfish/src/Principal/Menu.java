@@ -4,10 +4,7 @@ import modelo.*;
 import Servicios.*;
 import java.util.Scanner;
 import java.util.List;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import Servicios.OperacionesFecha;
 
 /**
  *
@@ -45,7 +42,7 @@ public class Menu {
 					correoActivo = correoLogin;
 					autenticado = true;
 
-					// Cargar eventos del usuario desde el archivo de usuarios
+					// Cargar eventos del usuario
 					List<Evento> eventosGuardados = auth.obtenerEventos(correoActivo);
 					if (!eventosGuardados.isEmpty()) {
 						// Actualizar contador de IdEvento para evitar IDs duplicados
@@ -67,6 +64,11 @@ public class Menu {
 					} else {
 						System.out.println("Bienvenido, " + correoActivo + "!");
 					}
+
+					// Verificar eventos cercanos y notificar por Telegram
+					String chatId = auth.obtenerTelegramChatId(correoActivo);
+					System.out.println("Verificando recordatorios...");
+					Utiliades.verificarEventosCercanos(operaciones.mostrarTodos(), chatId);
 
 				} else {
 					System.out.println("Correo o contraseña incorrectos.");
@@ -106,12 +108,13 @@ public class Menu {
 			System.out.println("--------MENU-------");
 			System.out.println("1. Crear Evento");
 			System.out.println("2. Mostrar Por Codigo");
-			System.out.println("3. Mostar Eventos");
+			System.out.println("3. Mostrar Eventos");
 			System.out.println("4. Modificar Estado");
 			System.out.println("5. Eliminar Evento");
 			System.out.println("6. Guardar");
-			System.out.println("7. Eliminar Cuenta");
-			System.out.println("8. Salir");
+			System.out.println("7. Configurar Telegram");
+			System.out.println("8. Eliminar Cuenta");
+			System.out.println("9. Salir");
 			opcion = teclado.nextInt();
 
 			switch (opcion) {
@@ -122,6 +125,7 @@ public class Menu {
 
 				System.out.println("Digite la hora del evento (ej: 10:30 AM o 2:45 PM): ");
 				horaStr = teclado.nextLine();
+
 				System.out.println("Ingrese Actividad ");
 				actividad = teclado.nextLine();
 
@@ -132,7 +136,7 @@ public class Menu {
 					System.out.println("Ingrese Prioridad 1(Alta), 2(Media), 3(Baja): ");
 					prioridad = teclado.nextInt();
 					if (prioridad < 1 || prioridad > 3) {
-						System.out.println("Opción inválida. Solo se permite 1, 2 o 3.");
+						System.out.println("Opcion invalida. Solo se permite 1, 2 o 3.");
 					}
 				} while (prioridad < 1 || prioridad > 3);
 
@@ -147,11 +151,11 @@ public class Menu {
 						estado = false;
 					}
 					if (comparacion < 1 || comparacion > 2) {
-						System.out.println("Opción inválida. Solo se permite 1 o 2 ");
+						System.out.println("Opcion invalida. Solo se permite 1 o 2 ");
 					}
 				} while (comparacion < 1 || comparacion > 2);
 
-				Evento nuevoEvento = new Evento(null, OperacionesFecha.parseFecha(fechaEntrga, horaStr), actividad,
+				Evento nuevoEvento = new Evento(null, Utiliades.parseFecha(fechaEntrga, horaStr), actividad,
 						descripcion, prioridad, estado);
 				System.out.println(operaciones.crear(nuevoEvento) + " Con el id: " + nuevoEvento.getId());
 				break;
@@ -188,7 +192,7 @@ public class Menu {
 						estado = false;
 					}
 					if (comparacion < 1 || comparacion > 2) {
-						System.out.println("Opción inválida. Solo se permite 1 o 2 ");
+						System.out.println("Opcion invalida. Solo se permite 1 o 2 ");
 					}
 				}
 
@@ -210,12 +214,57 @@ public class Menu {
 				break;
 
 			case 6:
-				// Guardar eventos dentro del archivo de usuarios
 				auth.actualizarEventos(correoActivo, operaciones.mostrarTodos());
 				System.out.println("Guardado....");
 				break;
 
 			case 7:
+				teclado.nextLine(); // limpiar buffer
+				int opcionTelegram;
+				do {
+					System.out.println("\n-------- CONFIGURAR TELEGRAM --------");
+					System.out.println("Para recibir notificaciones necesitas:");
+					System.out.println("  1. Buscar tu bot en Telegram y presionar START");
+					System.out.println("     -> Nombre del bot: @JasbelBOT");
+					System.out.println("  2. Buscar @userinfobot en Telegram,");
+					System.out.println("     escribirle cualquier mensaje y copiar tu ID");
+					System.out.println("  3. Ingresar ese ID en la opcion 2 de este menu");
+					System.out.println("--------------------------------------");
+					System.out.println("1. Ver mi Chat ID actual");
+					System.out.println("2. Ingresar / Actualizar Chat ID");
+					System.out.println("3. Volver al menu principal");
+					opcionTelegram = teclado.nextInt();
+					teclado.nextLine(); // limpiar buffer
+
+					switch (opcionTelegram) {
+					case 1:
+						String chatIdActual = auth.obtenerTelegramChatId(correoActivo);
+						if (chatIdActual != null && !chatIdActual.isBlank() && !chatIdActual.equals("0")) {
+							System.out.println("Tu Chat ID actual es: " + chatIdActual);
+						} else {
+							System.out.println("No tienes un Chat ID configurado.");
+						}
+						break;
+
+					case 2:
+						System.out.println("Ingrese su Chat ID (0 para desactivar notificaciones): ");
+						String nuevoChatId = teclado.nextLine();
+						auth.actualizarTelegramChatId(correoActivo, nuevoChatId);
+						System.out.println("Chat ID actualizado correctamente.");
+						break;
+
+					case 3:
+						System.out.println("Volviendo al menu principal...");
+						break;
+
+					default:
+						System.out.println("Opcion invalida.");
+					}
+
+				} while (opcionTelegram != 3);
+				break;
+
+			case 8:
 				System.out.println("Ingrese su contraseña para confirmar: ");
 				String passElim = teclado.next();
 				String resultado = auth.eliminar(correoActivo, passElim);
@@ -227,8 +276,7 @@ public class Menu {
 				}
 				break;
 
-			case 8:
-				// Guardar automáticamente al salir
+			case 9:
 				auth.actualizarEventos(correoActivo, operaciones.mostrarTodos());
 				System.out.println("Eventos guardados. Hasta luego!");
 				break;
@@ -237,9 +285,7 @@ public class Menu {
 				System.out.println("Opcion Invalida");
 			}
 
-		} while (opcion != 8);
+		} while (opcion != 9);
 	}
-
-	
 
 }

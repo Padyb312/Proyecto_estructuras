@@ -24,7 +24,6 @@ public class ImplemtacionLogeo implements OperacionLogeo, OperacionArchivo {
 	public boolean iniciarSesion(String correo, String password) {
 		if (!correoValido(correo))
 			return false;
-
 		String hash = hashSHA256(password);
 		for (Usuario u : usuarios) {
 			if (u.getCorreo().equals(correo) && u.getContraseña().equals(hash)) {
@@ -50,6 +49,27 @@ public class ImplemtacionLogeo implements OperacionLogeo, OperacionArchivo {
 		usuarios.add(new Usuario(correo, hashSHA256(password)));
 		guardarUsuarios();
 		return "Usuario registrado exitosamente.";
+	}
+
+	// Retorna el chatId de Telegram del usuario
+	public String obtenerTelegramChatId(String correo) {
+		for (Usuario u : usuarios) {
+			if (u.getCorreo().equals(correo)) {
+				return u.getTelegramChatId();
+			}
+		}
+		return null;
+	}
+
+	// Actualiza el chatId de Telegram del usuario y guarda el archivo
+	public void actualizarTelegramChatId(String correo, String chatId) {
+		for (Usuario u : usuarios) {
+			if (u.getCorreo().equals(correo)) {
+				u.setTelegramChatId(chatId);
+				guardarUsuarios();
+				return;
+			}
+		}
 	}
 
 	// Retorna los eventos guardados del usuario, o lista vacía si no tiene
@@ -102,7 +122,7 @@ public class ImplemtacionLogeo implements OperacionLogeo, OperacionArchivo {
 		}
 	}
 
-	// ─── Hash SHA-256 (Java puro, sin librerías externas) ────────────────────────
+	// ─── Hash SHA-256 ─────────────────────────────────────────────────────────
 
 	private String hashSHA256(String texto) {
 		try {
@@ -136,7 +156,6 @@ public class ImplemtacionLogeo implements OperacionLogeo, OperacionArchivo {
 
 	@Override
 	public String registar(String correo, String contraseña, String contraseñaConfirmada) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
