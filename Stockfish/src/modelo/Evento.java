@@ -1,31 +1,39 @@
 package modelo;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
-public abstract class Evento implements Serializable {
-	
-	
-	
-	public String id;
-	public String fecha;
-	public String actividad;
-	public int prioridad;
-	public boolean estado;
-	public int franja;
+public class Evento implements Serializable {
 
-	
+	private String id;
+	private LocalDateTime fecha;
+	private String actividad;
+	private String descripcion;
+	private int prioridad;
+	private boolean estado;
 
-	public Evento(String fecha, String actividad, int prioridad, boolean estado, int franja) {
-		this.id = String.valueOf(IdEvento.generarId()); //  ID generado automáticamente
+	public Evento() {
+	}
+
+	public Evento(String id, LocalDateTime fecha, String actividad, String descripcion, int prioridad, boolean estado) {
+		this.id = String.valueOf(IdEvento.generarId()); // ID generado automáticamente
 		this.fecha = fecha;
 		this.actividad = actividad;
+		this.descripcion = descripcion;
 		this.prioridad = prioridad;
 		this.estado = estado;
-		this.franja = franja;
 	}
 
 	public String getId() {
 		return id;
+	}
+
+	public LocalDateTime getFecha() {
+		return fecha;
+	}
+
+	public void setFecha(LocalDateTime fecha) {
+		this.fecha = fecha;
 	}
 
 	public String getActividad() {
@@ -34,6 +42,14 @@ public abstract class Evento implements Serializable {
 
 	public void setActividad(String actividad) {
 		this.actividad = actividad;
+	}
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
 	}
 
 	public int getPrioridad() {
@@ -52,70 +68,9 @@ public abstract class Evento implements Serializable {
 		this.estado = estado;
 	}
 
-	public String getFecha() {
-		return fecha;
-	}
-
-	public void setFecha(String fecha) {
-		this.fecha = fecha;
-	}
-
-	public int getFranja() {
-		return franja;
-	}
-
-	public void setFranja(int franja) {
-		this.franja = franja;
-	}
-
 	@Override
 	public String toString() {
-		return "ID: " + id + " | Fecha: " + fecha + " \n | Actividad: " + actividad + " | Prioridad: " + prioridad
-				+ "\n | Estado: " + estado + " | Franja: " + franja;
-	}
-
-	public String cambiarEstado(boolean estado) {
-		boolean origen = isEstado();
-		if (isEstado() == estado) {
-			return "Estado no cambiado";
-		} else {
-			setEstado(estado);
-
-			return "Estado Actualizado a " + isEstado();
-		}
-	}
-
-	public String cambiarPrioridad(int prioridad) {
-		int origen = getPrioridad();
-		if (getPrioridad() == prioridad) {
-			return "Prioridad no cambiado";
-		} else {
-			setPrioridad(prioridad);
-
-			return "Prioridad Actualizada a " + getPrioridad();
-		}
-	}
-
-	public String cambiarFecha(String fecha) {
-		String fechaOriginal = getFecha();
-		if (fechaOriginal.equals(fecha)) {
-			return "Fecha no cambiada";
-		} else {
-			setFecha(fecha);
-
-			return "Prioridad Actualizada a " + getFecha();
-		}
-
-	}
-
-	public String cambiarFranja(int franja) {
-		int origen = getFranja();
-		if (getFranja() == franja) {
-			return "Franja no cambiada";
-		} else {
-			setFranja(franja);
-
-			return "Franja Actualizada a " + getFranja();
-		}
+		return "Evento{" + "id='" + id + '\'' + ", fecha=" + fecha + ", actividad='" + actividad + '\''
+				+ ", descripcion='" + descripcion + '\'' + ", prioridad=" + prioridad + ", estado=" + estado + '}';
 	}
 }

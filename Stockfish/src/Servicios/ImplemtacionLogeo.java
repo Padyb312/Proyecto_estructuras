@@ -1,5 +1,6 @@
 package Servicios;
 
+import modelo.Evento;
 import modelo.Usuario;
 
 import java.io.*;
@@ -8,25 +9,25 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AutenticacionService {
+public class ImplemtacionLogeo implements OperacionLogeo, OperacionArchivo {
 
 	private static final String ARCHIVO = "Usuarios";
 	private static final String DOMINIO = "@poligran.edu.co";
 
 	private List<Usuario> usuarios;
 
-	public AutenticacionService() {
+	public ImplemtacionLogeo() {
 		this.usuarios = cargarUsuarios();
 	}
 
 	// Retorna true si las credenciales son correctas
-	public boolean login(String correo, String password) {
+	public boolean iniciarSesion(String correo, String password) {
 		if (!correoValido(correo))
 			return false;
 
 		String hash = hashSHA256(password);
 		for (Usuario u : usuarios) {
-			if (u.getCorreo().equals(correo) && u.getPasswordHash().equals(hash)) {
+			if (u.getCorreo().equals(correo) && u.getContraseña().equals(hash)) {
 				return true;
 			}
 		}
@@ -49,6 +50,28 @@ public class AutenticacionService {
 		usuarios.add(new Usuario(correo, hashSHA256(password)));
 		guardarUsuarios();
 		return "Usuario registrado exitosamente.";
+	}
+
+	// Retorna los eventos guardados del usuario, o lista vacía si no tiene
+	public List<Evento> obtenerEventos(String correo) {
+		for (Usuario u : usuarios) {
+			if (u.getCorreo().equals(correo)) {
+				List<Evento> eventos = u.getEventos();
+				return (eventos != null) ? eventos : new ArrayList<>();
+			}
+		}
+		return new ArrayList<>();
+	}
+
+	// Actualiza los eventos del usuario y guarda el archivo
+	public void actualizarEventos(String correo, List<Evento> eventos) {
+		for (Usuario u : usuarios) {
+			if (u.getCorreo().equals(correo)) {
+				u.setEventos(eventos);
+				guardarUsuarios();
+				return;
+			}
+		}
 	}
 
 	// Valida que el correo termine en @poligran.edu.co y tenga algo antes
@@ -94,20 +117,57 @@ public class AutenticacionService {
 			throw new RuntimeException("Error al hashear contraseña", e);
 		}
 	}
+
 	// Retorna mensaje según resultado de la eliminación
 	public String eliminar(String correo, String password) {
-	    if (!correoValido(correo)) {
-	        return "Correo inválido.";
-	    }
-	    String hash = hashSHA256(password);
-	    for (int i = 0; i < usuarios.size(); i++) {
-	        if (usuarios.get(i).getCorreo().equals(correo)
-	                && usuarios.get(i).getPasswordHash().equals(hash)) {
-	            usuarios.remove(i);
-	            guardarUsuarios();
-	            return "Usuario eliminado exitosamente.";
-	        }
-	    }
-	    return "Correo o contraseña incorrectos.";
+		if (!correoValido(correo)) {
+			return "Correo inválido.";
+		}
+		String hash = hashSHA256(password);
+		for (int i = 0; i < usuarios.size(); i++) {
+			if (usuarios.get(i).getCorreo().equals(correo) && usuarios.get(i).getContraseña().equals(hash)) {
+				usuarios.remove(i);
+				guardarUsuarios();
+				return "Usuario eliminado exitosamente.";
+			}
+		}
+		return "Correo o contraseña incorrectos.";
+	}
+
+	@Override
+	public String registar(String correo, String contraseña, String contraseñaConfirmada) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String serializar(List<Usuario> Usuarios, String path, String name) throws Exception {
+		try {
+			FileOutputStream fos = new FileOutputStream(path + name);
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(Usuarios);
+			oos.close();
+			fos.close();
+			return "File created!!";
+		} catch (IOException ioe) {
+			return "Error file " + ioe.getMessage();
+		}
+	}
+
+	@Override
+	public List<Usuario> deserializar(String path, String name) throws Exception {
+		List<Usuario> lista = null;
+		try {
+			FileInputStream fis = new FileInputStream(path + name);
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			lista = (List<Usuario>) ois.readObject();
+			ois.close();
+			fis.close();
+		} catch (IOException ioe) {
+			System.err.println(ioe.getMessage());
+		} catch (ClassNotFoundException c) {
+			System.err.println(c.getMessage());
+		}
+		return lista;
 	}
 }

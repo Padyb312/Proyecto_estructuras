@@ -4,7 +4,10 @@ import modelo.*;
 import Servicios.*;
 import java.util.Scanner;
 import java.util.List;
-
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import Servicios.OperacionesFecha;
 /**
  *
  * @author Kenneth Damian Fonseca Bernal
@@ -16,7 +19,7 @@ public class Menu {
 	public static void main(String[] args) {
 		Scanner teclado = new Scanner(System.in);
 		ImplementacionOperacionCRUD operaciones = new ImplementacionOperacionCRUD();
-		AutenticacionService auth = new AutenticacionService();
+		ImplemtacionLogeo auth = new ImplemtacionLogeo();
 
 		// ─── Menú de autenticación ───────────────────────────────────────────────────
 		boolean autenticado = false;
@@ -37,28 +40,30 @@ public class Menu {
 				System.out.println("Contraseña: ");
 				String passLogin = teclado.next();
 
-				if (auth.login(correoLogin, passLogin)) {
+				if (auth.iniciarSesion(correoLogin, passLogin)) {
 					correoActivo = correoLogin;
 					autenticado = true;
 
-					// Cargar eventos del usuario al iniciar sesión
-					try {
-						java.io.File archivoEventos = new java.io.File(archivoUsuario(correoActivo));
-						if (archivoEventos.exists()) {
-							List<Evento> eventosGuardados = operaciones.deserializar("", archivoUsuario(correoActivo));
-							if (eventosGuardados != null && !eventosGuardados.isEmpty()) {
-								for (Evento e : eventosGuardados) {
-									operaciones.crear(e);
-								}
-								System.out.println("Bienvenido, " + correoActivo + "! (" + eventosGuardados.size()
-										+ " eventos cargados)");
-							} else {
-								System.out.println("Bienvenido, " + correoActivo + "!");
+					// Cargar eventos del usuario desde el archivo de usuarios
+					List<Evento> eventosGuardados = auth.obtenerEventos(correoActivo);
+					if (!eventosGuardados.isEmpty()) {
+						// Actualizar contador de IdEvento para evitar IDs duplicados
+						int maxId = eventosGuardados.stream().mapToInt(e -> {
+							try {
+								return Integer.parseInt(e.getId());
+							} catch (NumberFormatException ex) {
+								return 0;
 							}
-						} else {
-							System.out.println("Bienvenido, " + correoActivo + "!");
+						}).max().orElse(0);
+						if (maxId >= IdEvento.getCont()) {
+							IdEvento.setCont(maxId + 1);
 						}
-					} catch (Exception e) {
+						for (Evento e : eventosGuardados) {
+							operaciones.crear(e);
+						}
+						System.out.println(
+								"Bienvenido, " + correoActivo + "! (" + eventosGuardados.size() + " eventos cargados)");
+					} else {
 						System.out.println("Bienvenido, " + correoActivo + "!");
 					}
 
@@ -91,8 +96,8 @@ public class Menu {
 
 		// ─── Menú principal ──────────────────────────────────────────────────────────
 
-		String fechaInicio, fechaEntrga, descripcion, materia, codigo;
-		int prioridad = 0, franja = -1, comparacion = 0;
+		String fechaEntrga, actividad, descripcion, codigo, horaStr;
+		int prioridad = 0, comparacion = 0;
 		boolean estado = false;
 		int opcion;
 
@@ -110,121 +115,45 @@ public class Menu {
 
 			switch (opcion) {
 			case 1:
+				teclado.nextLine(); // limpiar buffer
+				System.out.println("Digite Fecha DD/MM/YY");
+				fechaEntrga = teclado.nextLine();
+
+				System.out.println("Digite la hora del evento (ej: 10:30 AM o 2:45 PM): ");
+				horaStr = teclado.nextLine();
+				System.out.println("Ingrese Actividad ");
+				actividad = teclado.nextLine();
+
+				System.out.println("Ingrese Descripcion ");
+				descripcion = teclado.nextLine();
+
 				do {
-					System.out.println("----Sub MENU----");
-					System.out.println("1. Tarea");
-					System.out.println("2. Evento Personal o activida extraCurricular");
-					System.out.println("3. volver");
-					opcion = teclado.nextInt();
-
-					switch (opcion) {
-					case 1:
-
-						System.out.println("Digite Fecha de Inicio DD/MM/YY");
-						fechaInicio = teclado.next();
-
-						System.out.println("Digite Fecha de Entrega DD/MM/YY");
-						fechaEntrga = teclado.next();
-
-						System.out.println("Digite Materia ");
-						materia = teclado.next();
-
-						System.out.println("Ingrese Actividad ");
-						descripcion = teclado.next();
-
-						do {
-							System.out.println("Digite horario segun la siguinte franja");
-
-							franja = teclado.nextInt();
-							if (franja < 1 || franja > 23) {
-								System.out.println("Opción inválida. Solo se permite numeros del 0 al 23.");
-							}
-						} while (franja < 0 || franja > 23);
-
-						do {
-							System.out.println("Ingrese Prioridad 1(Alta), 2(Media), 3(Baja): ");
-							prioridad = teclado.nextInt();
-							if (prioridad < 1 || prioridad > 3) {
-								System.out.println("Opción inválida. Solo se permite 1, 2 o 3.");
-							}
-						} while (prioridad < 1 || prioridad > 3);
-
-						comparacion = 0;
-						do {
-							System.out.println("Ingrese estado 1(Completado), 2(Incompleto) ");
-							comparacion = teclado.nextInt();
-							if (comparacion == 1) {
-								estado = true;
-							}
-							if (comparacion == 2) {
-								estado = false;
-							}
-							if (comparacion < 1 || comparacion > 2) {
-								System.out.println("Opción inválida. Solo se permite 1 o 2 ");
-							}
-						} while (comparacion < 1 || comparacion > 2);
-
-						Evento tareaBase = new Tarea(fechaEntrga, descripcion, prioridad, estado, franja, materia,
-								fechaInicio);
-						System.out.println(operaciones.crear(tareaBase) + " Con el id: " + tareaBase.getId());
-						break;
-
-					case 2:
-
-						System.out.println("Digite Fecha de Evento DD/MM/YY");
-						fechaEntrga = teclado.next();
-
-						System.out.println("Descripcion  (Sin espacios) ");
-						descripcion = teclado.next();
-
-						do {
-							System.out.println("Digite horario segun la siguinte franja");
-
-							franja = teclado.nextInt();
-							if (franja < 1 || franja > 23) {
-								System.out.println("Opción inválida. Solo se permite numeros del 0 al 23.");
-							}
-						} while (franja < 0 || franja > 23);
-
-						System.out.println("Ingrese Prioridad 1(Alta), 2(Media), 3(Baja): ");
-						prioridad = teclado.nextInt();
-						while (prioridad < 1 || prioridad > 3) {
-							System.out.println("Ingrese Prioridad 1(Alta), 2(Media), 3(Baja): ");
-							prioridad = teclado.nextInt();
-							if (prioridad < 1 || prioridad > 3) {
-								System.out.println("Opción inválida. Solo se permite 1, 2 o 3.");
-							}
-						}
-
-						comparacion = 0;
-						do {
-							System.out.println("Ingrese estado 1(Completado), 2(Incompleto) ");
-							comparacion = teclado.nextInt();
-							if (comparacion == 1) {
-								estado = true;
-							}
-							if (comparacion == 2) {
-								estado = false;
-							}
-							if (comparacion < 1 || comparacion > 2) {
-								System.out.println("Opción inválida. Solo se permite 1 o 2 ");
-							}
-						} while (comparacion < 1 || comparacion > 2);
-
-						Evento personalBase = new ActividadPersonal(fechaEntrga, descripcion, prioridad, estado,
-								franja);
-						System.out.println(operaciones.crear(personalBase) + " Con el id: " + personalBase.getId());
-						break;
-
-					case 3:
-						System.out.println("volviendo");
-						break;
-
-					default:
-						System.out.println("Opcion Invalida");
+					System.out.println("Ingrese Prioridad 1(Alta), 2(Media), 3(Baja): ");
+					prioridad = teclado.nextInt();
+					if (prioridad < 1 || prioridad > 3) {
+						System.out.println("Opción inválida. Solo se permite 1, 2 o 3.");
 					}
+				} while (prioridad < 1 || prioridad > 3);
 
-				} while (opcion != 3);
+				comparacion = 0;
+				do {
+					System.out.println("Ingrese estado 1(Completado), 2(Incompleto) ");
+					comparacion = teclado.nextInt();
+					if (comparacion == 1) {
+						estado = true;
+					}
+					if (comparacion == 2) {
+						estado = false;
+					}
+					if (comparacion < 1 || comparacion > 2) {
+						System.out.println("Opción inválida. Solo se permite 1 o 2 ");
+					}
+				} while (comparacion < 1 || comparacion > 2);
+
+				
+				Evento nuevoEvento = new Evento(null, OperacionesFecha.parseFecha(fechaEntrga, horaStr), actividad, descripcion,
+						prioridad, estado);
+				System.out.println(operaciones.crear(nuevoEvento) + " Con el id: " + nuevoEvento.getId());
 				break;
 
 			case 2:
@@ -264,7 +193,9 @@ public class Menu {
 				}
 
 				Evento cambiarEstado = operaciones.mostrarUno(codigo);
-				if (estado == cambiarEstado.isEstado()) {
+				if (cambiarEstado == null) {
+					System.out.println("Evento no encontrado.");
+				} else if (estado == cambiarEstado.isEstado()) {
 					System.out.println("El estado no ha sido alterado ya que es el mismo ");
 				} else {
 					cambiarEstado.setEstado(estado);
@@ -279,26 +210,18 @@ public class Menu {
 				break;
 
 			case 6:
-				try {
-					List<Evento> listaGuardar = operaciones.mostrarTodos();
-					System.out.println(operaciones.serializar(listaGuardar, "", archivoUsuario(correoActivo)));
-					System.out.println("Guardado....");
-				} catch (Exception e) {
-					System.out.println("Error al guardar los Eventos: " + e.getMessage());
-				}
+				// Guardar eventos dentro del archivo de usuarios
+				auth.actualizarEventos(correoActivo, operaciones.mostrarTodos());
+				System.out.println("Guardado....");
 				break;
 
 			case 7:
-				// Confirmar con contraseña antes de eliminar
 				System.out.println("Ingrese su contraseña para confirmar: ");
 				String passElim = teclado.next();
 				String resultado = auth.eliminar(correoActivo, passElim);
 				System.out.println(resultado);
 
-				// Si se eliminó exitosamente cerrar el programa
 				if (resultado.equals("Usuario eliminado exitosamente.")) {
-					// Borrar también el archivo de eventos del usuario
-					new java.io.File(archivoUsuario(correoActivo)).delete();
 					System.out.println("Hasta luego!");
 					System.exit(0);
 				}
@@ -306,14 +229,8 @@ public class Menu {
 
 			case 8:
 				// Guardar automáticamente al salir
-				try {
-					List<Evento> listaFinal = operaciones.mostrarTodos();
-					operaciones.serializar(listaFinal, "", archivoUsuario(correoActivo));
-					System.out.println("Eventos guardados. Hasta luego!");
-				} catch (Exception e) {
-					System.out.println("Error al guardar: " + e.getMessage());
-					System.out.println("Saliendo....");
-				}
+				auth.actualizarEventos(correoActivo, operaciones.mostrarTodos());
+				System.out.println("Eventos guardados. Hasta luego!");
 				break;
 
 			default:
@@ -324,11 +241,7 @@ public class Menu {
 	}
 
 	/**
-	 * Convierte el correo en un nombre de archivo válido. Ejemplo:
-	 * juan@poligran.edu.co → juan_poligran_edu_co_eventos
+	 * Convierte una fecha en formato DD/MM/YY y una hora (0-23) a LocalDateTime.
 	 */
-	private static String archivoUsuario(String correo) {
-		return correo.replace("@", "").replace(".", "") + "Eventos";
-	}
 
 }
