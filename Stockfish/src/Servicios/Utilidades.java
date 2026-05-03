@@ -12,7 +12,7 @@ import java.net.URLEncoder;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-public class Utiliades {
+public class Utilidades {
 
 	/**
 	 * Convierte una fecha en formato DD/MM/YY y una hora en formato 12h (AM/PM) a

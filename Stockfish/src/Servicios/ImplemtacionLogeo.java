@@ -34,7 +34,8 @@ public class ImplemtacionLogeo implements OperacionLogeo, OperacionArchivo {
 	}
 
 	// Retorna mensaje según resultado del registro
-	public String registrar(String correo, String password, String confirmacion) {
+	public String registrar(String correo, String password, String confirmacion, String nombres, String apellidos,
+			String facultad) {
 		if (!correoValido(correo)) {
 			return "El correo debe ser institucional. Ejemplo: nombre" + DOMINIO;
 		}
@@ -46,7 +47,7 @@ public class ImplemtacionLogeo implements OperacionLogeo, OperacionArchivo {
 				return "El correo ya está registrado.";
 			}
 		}
-		usuarios.add(new Usuario(correo, hashSHA256(password)));
+		usuarios.add(new Usuario(correo, hashSHA256(password), nombres, apellidos, facultad));
 		guardarUsuarios();
 		return "Usuario registrado exitosamente.";
 	}

@@ -68,7 +68,7 @@ public class Menu {
 					// Verificar eventos cercanos y notificar por Telegram
 					String chatId = auth.obtenerTelegramChatId(correoActivo);
 					System.out.println("Verificando recordatorios...");
-					Utiliades.verificarEventosCercanos(operaciones.mostrarTodos(), chatId);
+					Utilidades.verificarEventosCercanos(operaciones.mostrarTodos(), chatId);
 
 				} else {
 					System.out.println("Correo o contraseña incorrectos.");
@@ -76,6 +76,13 @@ public class Menu {
 				break;
 
 			case 2:
+				System.out.println("Ingrese sus Nombres: ");
+				String nombres = teclado.next();
+				
+				System.out.println("Ingrese sus Apellidos: ");
+				String apellidos = teclado.next();
+				System.out.println("Ingrese su Facultad: ");
+				String Facultad = teclado.next();
 				System.out.println("Correo institucional (@poligran.edu.co): ");
 				String correoReg = teclado.next();
 				System.out.println("Contraseña: ");
@@ -83,7 +90,7 @@ public class Menu {
 				System.out.println("Confirmar contraseña: ");
 				String confirmacion = teclado.next();
 
-				System.out.println(auth.registrar(correoReg, passReg, confirmacion));
+				System.out.println(auth.registrar(correoReg, passReg, confirmacion,nombres,apellidos,Facultad));
 				break;
 
 			case 3:
@@ -155,7 +162,7 @@ public class Menu {
 					}
 				} while (comparacion < 1 || comparacion > 2);
 
-				Evento nuevoEvento = new Evento(null, Utiliades.parseFecha(fechaEntrga, horaStr), actividad,
+				Evento nuevoEvento = new Evento(null, Utilidades.parseFecha(fechaEntrga, horaStr), actividad,
 						descripcion, prioridad, estado);
 				System.out.println(operaciones.crear(nuevoEvento) + " Con el id: " + nuevoEvento.getId());
 				break;

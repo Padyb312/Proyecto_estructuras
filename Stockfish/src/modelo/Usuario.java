@@ -9,13 +9,17 @@ public class Usuario implements Serializable {
 	private String contraseña;
 	private List<Evento> eventos;
 	private String telegramChatId;
+	private String nombres;
+	private String apellidos;
+	private String facultad;
 
-	public Usuario() {
-	}
-
-	public Usuario(String correo, String contraseña) {
+	public Usuario(String correo, String contraseña, String nombres, String apellidos, String facultad) {
+		super();
 		this.correo = correo;
 		this.contraseña = contraseña;
+		this.nombres = nombres;
+		this.apellidos = apellidos;
+		this.facultad = facultad;
 		this.eventos = eventos;
 	}
 
@@ -51,9 +55,34 @@ public class Usuario implements Serializable {
 		this.telegramChatId = telegramChatId;
 	}
 
+	public String getNombres() {
+		return nombres;
+	}
+
+	public void setNombres(String nombres) {
+		this.nombres = nombres;
+	}
+
+	public String getApellidos() {
+		return apellidos;
+	}
+
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
+	}
+
+	public String getFacultad() {
+		return facultad;
+	}
+
+	public void setFacultad(String facultad) {
+		this.facultad = facultad;
+	}
+
 	@Override
 	public String toString() {
-		return "Usuario{" + "correo='" + correo + '\'' + ", contraseña='" + contraseña + '\'' + ", telegramChatId='"
-				+ telegramChatId + '\'' + ", eventos=" + eventos + '}';
+		return "Usuario [correo=" + correo + ", contraseña=" + contraseña + ", eventos=" + eventos + ", telegramChatId="
+				+ telegramChatId + ", nombres=" + nombres + ", apellidos=" + apellidos + ", facultad=" + facultad + "]";
 	}
+
 }
