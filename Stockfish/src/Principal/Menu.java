@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import Servicios.OperacionesFecha;
+
 /**
  *
  * @author Kenneth Damian Fonseca Bernal
@@ -150,9 +151,8 @@ public class Menu {
 					}
 				} while (comparacion < 1 || comparacion > 2);
 
-				
-				Evento nuevoEvento = new Evento(null, OperacionesFecha.parseFecha(fechaEntrga, horaStr), actividad, descripcion,
-						prioridad, estado);
+				Evento nuevoEvento = new Evento(null, OperacionesFecha.parseFecha(fechaEntrga, horaStr), actividad,
+						descripcion, prioridad, estado);
 				System.out.println(operaciones.crear(nuevoEvento) + " Con el id: " + nuevoEvento.getId());
 				break;
 
@@ -240,8 +240,6 @@ public class Menu {
 		} while (opcion != 8);
 	}
 
-	/**
-	 * Convierte una fecha en formato DD/MM/YY y una hora (0-23) a LocalDateTime.
-	 */
+	
 
 }
