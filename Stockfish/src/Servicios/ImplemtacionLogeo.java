@@ -20,6 +20,20 @@ public class ImplemtacionLogeo implements OperacionLogeo, OperacionArchivo {
 		this.usuarios = cargarUsuarios();
 	}
 
+	// Actualiza nombres, apellidos y facultad del usuario
+	public String actualizarDatosUsuario(String correo, String nombres, String apellidos, String facultad) {
+		for (Usuario u : usuarios) {
+			if (u.getCorreo().equals(correo)) {
+				u.setNombres(nombres);
+				u.setApellidos(apellidos);
+				u.setFacultad(facultad);
+				guardarUsuarios();
+				return "Datos actualizados correctamente.";
+			}
+		}
+		return "Usuario no encontrado.";
+	}
+
 	// Retorna true si las credenciales son correctas
 	public boolean iniciarSesion(String correo, String password) {
 		if (!correoValido(correo))
@@ -189,5 +203,15 @@ public class ImplemtacionLogeo implements OperacionLogeo, OperacionArchivo {
 			System.err.println(c.getMessage());
 		}
 		return lista;
+	}
+
+	// Retorna el objeto Usuario completo según su correo
+	public Usuario obtenerUsuario(String correo) {
+		for (Usuario u : usuarios) {
+			if (u.getCorreo().equals(correo)) {
+				return u;
+			}
+		}
+		return null;
 	}
 }
