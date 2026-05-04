@@ -116,8 +116,7 @@ public class Menu {
 			System.out.println("5. Eliminar Evento");
 			System.out.println("6. Guardar");
 			System.out.println("7. Ajustes");
-			System.out.println("8. Eliminar Cuenta");
-			System.out.println("9. Salir");
+			System.out.println("8. Salir");
 			opcion = teclado.nextInt();
 
 			switch (opcion) {
@@ -220,7 +219,8 @@ public class Menu {
 					System.out.println("\n-------- AJUSTES --------");
 					System.out.println("1. Configurar Telegram");
 					System.out.println("2. Configurar Usuario");
-					System.out.println("3. Volver al menu principal");
+					System.out.println("3. Eliminar Cuenta");
+					System.out.println("4. Volver al menu principal");
 					opcionAjustes = teclado.nextInt();
 					teclado.nextLine();
 
@@ -284,7 +284,6 @@ public class Menu {
 						System.out.println("Ingrese nueva Facultad (Enter para mantener actual): ");
 						String nuevaFacultad = teclado.nextLine();
 
-						// Conservar valor actual si el usuario no ingresa nada
 						if (nuevoNombre.isBlank())
 							nuevoNombre = usuarioActual.getNombres();
 						if (nuevoApellido.isBlank())
@@ -296,28 +295,29 @@ public class Menu {
 								auth.actualizarDatosUsuario(correoActivo, nuevoNombre, nuevoApellido, nuevaFacultad));
 						break;
 
+					// ── Eliminar Cuenta ───────────────────────────────────────────
 					case 3:
+						System.out.println("Ingrese su contraseña para confirmar: ");
+						String passElim = teclado.next();
+						String resultado = auth.eliminar(correoActivo, passElim);
+						System.out.println(resultado);
+						if (resultado.equals("Usuario eliminado exitosamente.")) {
+							System.out.println("Hasta luego!");
+							System.exit(0);
+						}
+						break;
+
+					case 4:
 						System.out.println("Volviendo al menu principal...");
 						break;
 
 					default:
 						System.out.println("Opcion invalida.");
 					}
-				} while (opcionAjustes != 3);
+				} while (opcionAjustes != 4);
 				break;
 
 			case 8:
-				System.out.println("Ingrese su contraseña para confirmar: ");
-				String passElim = teclado.next();
-				String resultado = auth.eliminar(correoActivo, passElim);
-				System.out.println(resultado);
-				if (resultado.equals("Usuario eliminado exitosamente.")) {
-					System.out.println("Hasta luego!");
-					System.exit(0);
-				}
-				break;
-
-			case 9:
 				auth.actualizarEventos(correoActivo, operaciones.mostrarTodos());
 				System.out.println("Eventos guardados. Hasta luego!");
 				break;
@@ -326,6 +326,6 @@ public class Menu {
 				System.out.println("Opcion Invalida");
 			}
 
-		} while (opcion != 9);
+		} while (opcion != 8);
 	}
 }
